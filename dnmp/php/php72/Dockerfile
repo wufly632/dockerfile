@@ -100,6 +100,9 @@ RUN apt-get update \
 
 # Composer
 #RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
+#ENV COMPOSER_HOME /root/composer
+#RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#ENV PATH $COMPOSER_HOME/vendor/bin:$PATH
 
 # Install extension using pecl
 # Notice: if pecl install get error
@@ -122,3 +125,9 @@ RUN pecl install redis-3.1.4 \
     && apt-get install -y libmemcached-dev zlib1g-dev \
     && pecl install memcached-3.0.4 \
     && docker-php-ext-enable memcached
+
+RUN php -r "copy('https://install.phpcomposer.com/installer', 'composer-setup.php');" \
+    && php composer-setup.php \
+    && php -r "unlink('composer-setup.php');" \
+    && mv composer.phar /bin/composer \
+    && composer config -g repo.packagist composer https://packagist.phpcomposer.com
